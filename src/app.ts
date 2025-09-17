@@ -6,7 +6,9 @@ import { registerRoutes } from "./routes";
 import { errorHandler } from "./middlewares/globalErrorHandler.middleware";
 import { setupDynamicOpenAPI } from "./utils/openAPIDocsGenerator";
 import "reflect-metadata";
+import connectDB from "./data/database-connection";
 
+connectDB();
 const app = express();
 
 /** Middlewares */

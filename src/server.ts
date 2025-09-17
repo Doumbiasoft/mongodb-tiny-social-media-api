@@ -4,7 +4,7 @@ import { ENV } from "./config/env";
 import "colors";
 
 app.listen(ENV.PORT, () => {
-  console.log(`\nTiny Social Media RESTFull API`.bgGreen.white.bold);
+  console.log(`\nTiny Social Media + MongoDB RESTFull API`.bgGreen.white.bold);
   console.log(
     `🚀 Server running in ${ENV.NODE_ENV.green} mode on port ${
       ENV.PORT.toString().cyan
