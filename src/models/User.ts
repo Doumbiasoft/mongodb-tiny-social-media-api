@@ -1,15 +1,15 @@
-import mongoose from "mongoose";
+import mongoose, { Schema, Document, Model } from "mongoose";
 import { ValidationPatterns } from "../middlewares/validation.middleware";
 
-export interface User {
-  id: number;
+export interface IUser extends Document {
+  _id: number;
   name: string;
   username: string;
   email: string;
   createdAt: Date;
   updatedAt: Date;
 }
-export type Users = User[];
+export type Users = IUser[];
 
 const emailValidators = [
   {
@@ -32,7 +32,7 @@ const emailValidators = [
   },
 ];
 
-const userSchema = new mongoose.Schema({
+const userSchema = new Schema({
   name: {
     type: String,
     require: true,
@@ -62,7 +62,7 @@ const userSchema = new mongoose.Schema({
     lowerCase: true,
     validate: emailValidators,
   },
-  createdAt: { type: Date, default: Date.now() },
+  createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: () => Date.now() },
 });
 
@@ -70,4 +70,6 @@ userSchema.statics.getCount = async function () {
   return await mongoose.models.User.countDocuments();
 };
 
-export default mongoose.model("User", userSchema);
+const UserModel: Model<IUser> = mongoose.model<IUser>("User", userSchema);
+
+export default UserModel;
