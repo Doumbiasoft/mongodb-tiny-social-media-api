@@ -1,0 +1,51 @@
+{
+  "name": "mongodb-tiny-social-media-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "/src/server.ts",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Doumbiasoft/mongodb-tiny-social-media-api.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Doumbiasoft/mongodb-tiny-social-media-api/issues"
+  },
+  "homepage": "https://github.com/Doumbiasoft/mongodb-tiny-social-media-api#readme",
+  "dependencies": {
+    "@reflet/express": "^2.0.0",
+    "@reflet/express-middlewares": "^2.0.0",
+    "@reflet/http": "^1.0.0",
+    "@scalar/express-api-reference": "^0.8.18",
+    "colors": "^1.4.0",
+    "compression": "^1.8.1",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.2",
+    "ejs": "^3.1.10",
+    "express": "^5.1.0",
+    "morgan": "^1.10.1",
+    "reflect-metadata": "^0.2.2",
+    "swagger-ui-express": "^5.0.1",
+    "winston": "^3.17.0"
+  },
+  "devDependencies": {
+    "@types/compression": "^1.8.1",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.3",
+    "@types/morgan": "^1.9.10",
+    "@types/node": "^24.3.1",
+    "@types/swagger-ui-express": "^4.1.8",
+    "@types/winston": "^2.4.4",
+    "tsx": "^4.20.5",
+    "typescript": "^5.9.2"
+  }
+}
