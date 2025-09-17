@@ -18,7 +18,7 @@ const emailValidators = [
       return ValidationPatterns.EMAIL.test(email);
     },
     message: (props: any) =>
-      `${props.path} (${props.value}) is not a valid email address.`,
+      `${props.path}:(${props.value}) is not a valid email address.`,
   },
   {
     validator: async function (email: string) {
