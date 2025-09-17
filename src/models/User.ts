@@ -43,7 +43,7 @@ const userSchema = new Schema({
     type: String,
     require: true,
     unique: true,
-    lowerCase: true,
+    lowercase: true,
     validate: {
       validator: async function (username: string) {
         // Query the database to see if another user exists with the same username
@@ -59,7 +59,7 @@ const userSchema = new Schema({
     type: String,
     require: true,
     unique: true,
-    lowerCase: true,
+    lowercase: true,
     validate: emailValidators,
   },
   createdAt: { type: Date, default: Date.now },
