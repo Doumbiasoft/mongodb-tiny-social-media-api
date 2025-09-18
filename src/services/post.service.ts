@@ -13,11 +13,11 @@ export const findPostById = async (postId: string) => {
 export const createPost = async (post: Partial<IPost>) => {
   return await PostModel.create({ post });
 };
-export const updatePostById = async (postId: number, post: Partial<IPost>) => {
+export const updatePostById = async (postId: string, post: Partial<IPost>) => {
   return await PostModel.findByIdAndUpdate({ _id: postId }, post, {
     new: true,
   });
 };
-export const deletePostById = async (postId: number) => {
+export const deletePostById = async (postId: string) => {
   return await PostModel.findByIdAndDelete({ _id: postId });
 };
