@@ -7,14 +7,8 @@ import commentsData from "../seed/comment.json";
 
 export const seedScript = async () => {
   const existingUserCount = await UserModel.countDocuments();
-  const existingPostCount = await PostModel.countDocuments();
-  const existingCommentCount = await CommentModel.countDocuments();
 
-  if (
-    existingUserCount > 0 ||
-    existingPostCount > 0 ||
-    existingCommentCount > 0
-  ) {
+  if (existingUserCount > 0) {
     console.log("Database already seeded.");
     return;
   }
