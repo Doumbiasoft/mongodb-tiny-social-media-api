@@ -23,7 +23,7 @@ export const findCommentById = async (commentId: string) => {
 };
 
 export const createComment = async (comment: Partial<IComment>) => {
-  return await CommentModel.create({ comment });
+  return await CommentModel.create(comment);
 };
 export const updateCommentById = async (
   commentId: string,
@@ -31,6 +31,7 @@ export const updateCommentById = async (
 ) => {
   return await CommentModel.findByIdAndUpdate({ _id: commentId }, comment, {
     new: true,
+    runValidators: true,
   });
 };
 export const deleteCommentById = async (commentId: string) => {

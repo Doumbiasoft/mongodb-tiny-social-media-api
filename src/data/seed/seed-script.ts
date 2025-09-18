@@ -2,7 +2,7 @@ import CommentModel from "../../models/Comment";
 import PostModel from "../../models/Post";
 import UserModel from "../../models/User";
 import usersData from "../seed/user.json";
-import postsData from "../seed/user.json";
+import postsData from "../seed/post.json";
 import commentsData from "../seed/comment.json";
 
 export const seedScript = async () => {

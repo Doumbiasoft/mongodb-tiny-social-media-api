@@ -17,11 +17,12 @@ export const findUserById = async (userId: string) => {
   return await UserModel.findById({ _id: userId });
 };
 export const createUser = async (user: Partial<IUser>) => {
-  return await UserModel.create({ user });
+  return await UserModel.create(user);
 };
 export const updateUserById = async (userId: string, user: Partial<IUser>) => {
   return await UserModel.findByIdAndUpdate({ _id: userId }, user, {
     new: true,
+    runValidators: true,
   });
 };
 export const deleteUserById = async (userId: string) => {

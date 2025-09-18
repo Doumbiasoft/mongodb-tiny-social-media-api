@@ -11,11 +11,12 @@ export const findPostById = async (postId: string) => {
   return await PostModel.findById({ _id: postId });
 };
 export const createPost = async (post: Partial<IPost>) => {
-  return await PostModel.create({ post });
+  return await PostModel.create(post);
 };
 export const updatePostById = async (postId: string, post: Partial<IPost>) => {
   return await PostModel.findByIdAndUpdate({ _id: postId }, post, {
     new: true,
+    runValidators: true,
   });
 };
 export const deletePostById = async (postId: string) => {

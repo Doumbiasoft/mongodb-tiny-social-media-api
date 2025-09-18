@@ -1,6 +1,7 @@
 import { Application } from "express";
 import { register } from "@reflet/express";
 import { setApiPrefix } from "../../config/apiPrefix";
+import { UserController } from "../../controllers/v1/user.controller";
 
 /**
  * Register all v1 API controllers with dynamic prefix
@@ -8,5 +9,5 @@ import { setApiPrefix } from "../../config/apiPrefix";
 export function registerV1Routes(app: Application, apiPrefix: string): void {
   // Set the API prefix before register routes
   setApiPrefix(apiPrefix);
-  register(app, []);
+  register(app, [UserController]);
 }

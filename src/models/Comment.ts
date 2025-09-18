@@ -40,6 +40,7 @@ const commentSchema = new Schema({
         `This post with ${props.path}: (${props.value}) does not exit.`,
     },
   },
+  body: { type: String, require: true },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: () => Date.now() },
 });
