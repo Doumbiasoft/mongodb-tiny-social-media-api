@@ -12,6 +12,10 @@ export const seedScript = async () => {
     console.log("Database already seeded.");
     return;
   }
+  await CommentModel.deleteMany();
+  await PostModel.deleteMany();
+  await UserModel.deleteMany();
+
   const seededUsers = await UserModel.insertMany(usersData);
   console.log("Users seeded.");
 
