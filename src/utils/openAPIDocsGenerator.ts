@@ -515,7 +515,7 @@ export const generateDynamicOpenAPISpec = async (controllersDir?: string) => {
     openapi: "3.0.0",
     info: {
       version: "1.0.0",
-      title: "Tiny Social Media API",
+      title: "MongoDB Tiny Social Media API",
       description: `RESTful API - ${allRoutes.length} endpoints from ${controllerFiles.length} controllers`,
     },
     paths: {} as any,
