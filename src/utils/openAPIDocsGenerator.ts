@@ -363,7 +363,7 @@ async function extractRoutesFromFile(
     const methodRegex =
       /@(Get|Post|Put|Patch|Delete)\(([^)]*)\)\s*(@Use\s*\([\s\S]*?\)\s*)*async\s+(\w+)/g;
     const compiledMethodRegex =
-      /__decorate\[\s*\(0, express_1\.(Get|Post|Put|Patch|Delete)\)\(([^)]*)\),?\s*\(0, express_1\.Use\)\(([\s\S]*?)\),?\s*__param[\s\S]*?], (\w+Controller)\.prototype, "(\w+)"/g;
+      /__decorate\(\[\s*\(0, express_1\.(Get|Post|Put|Patch|Delete)\)\(([^)]*)\),?\s*\(0, express_1\.Use\)\(([\s\S]*?)\),?\s*__param[\s\S]*?\], (\w+Controller)\.prototype, "(\w+)"/g;
 
     let match;
 
@@ -658,9 +658,14 @@ export const generateDynamicOpenAPISpec = async (controllersDir?: string) => {
   const controllerFiles = await discoverControllers(defaultControllersDir);
   const allRoutes: DiscoveredRoute[] = [];
 
+  console.log(`🔍 Discovering controllers in: ${defaultControllersDir}`);
+  console.log(`📁 Found ${controllerFiles.length} controller files:`, controllerFiles);
+
   // Extract routes from each discovered controller
   for (const filePath of controllerFiles) {
+    console.log(`📄 Processing: ${filePath}`);
     const routes = await extractRoutesFromFile(filePath);
+    console.log(`🛣️  Found ${routes.length} routes in ${filePath}`);
     allRoutes.push(...routes);
   }
 
