@@ -81,6 +81,88 @@ async function discoverControllers(
 }
 
 /**
+ * Extract endpoint metadata from compiled @Use decorator content
+ */
+function extractCompiledEndpointMetadata(useContent: string):
+  | {
+      summary?: string;
+      description?: string;
+      tags?: string[];
+      operationId?: string;
+    }
+  | undefined {
+  const metadata: any = {};
+
+  // Extract endpointMetadata object from compiled format
+  const metadataMatch = useContent.match(
+    /endpointMetadata_middleware_1\.endpointMetadata\)\(\{\s*([\s\S]*?)\}\)/
+  );
+  if (metadataMatch) {
+    const objectContent = metadataMatch[1];
+
+    // Extract summary from the object
+    const summaryMatch = objectContent.match(/summary:\s*["'](.*?)["']/);
+    if (summaryMatch) metadata.summary = summaryMatch[1];
+
+    // Extract description from the object
+    const descriptionMatch = objectContent.match(
+      /description:\s*["']([\s\S]*?)["']/
+    );
+    if (descriptionMatch)
+      metadata.description = descriptionMatch[1].replace(/\s+/g, " ").trim();
+
+    // Extract operationId from the object
+    const operationIdMatch = objectContent.match(
+      /operationId:\s*["'](.*?)["']/
+    );
+    if (operationIdMatch) metadata.operationId = operationIdMatch[1];
+  }
+
+  return Object.keys(metadata).length > 0 ? metadata : undefined;
+}
+
+/**
+ * Extract validation rules from compiled @Use decorator content
+ */
+function extractCompiledValidationRules(useContent: string): {
+  params?: ValidationRule[];
+  query?: ValidationRule[];
+  body?: ValidationRule[];
+} {
+  const validation: {
+    params?: ValidationRule[];
+    query?: ValidationRule[];
+    body?: ValidationRule[];
+  } = {};
+
+  // Extract validateParams rules from compiled format
+  const paramsMatch = useContent.match(
+    /validation_middleware_1\.validateParams\)\(\{\s*rules:\s*\[([\s\S]*?)\]/
+  );
+  if (paramsMatch) {
+    validation.params = parseValidationRules(paramsMatch[1]);
+  }
+
+  // Extract validateQuery rules from compiled format
+  const queryMatch = useContent.match(
+    /validation_middleware_1\.validateQuery\)\(\{\s*rules:\s*\[([\s\S]*?)\]/
+  );
+  if (queryMatch) {
+    validation.query = parseValidationRules(queryMatch[1]);
+  }
+
+  // Extract validateBody rules from compiled format
+  const bodyMatch = useContent.match(
+    /validation_middleware_1\.validateBody\)\(\{\s*rules:\s*\[([\s\S]*?)\]/
+  );
+  if (bodyMatch) {
+    validation.body = parseValidationRules(bodyMatch[1]);
+  }
+
+  return validation;
+}
+
+/**
  * Extract endpoint metadata from @Use decorator content
  */
 function extractEndpointMetadata(useContent: string):
@@ -265,7 +347,7 @@ async function extractRoutesFromFile(
     const methodRegex =
       /@(Get|Post|Put|Patch|Delete)\(([^)]*)\)\s*(@Use\s*\([\s\S]*?\)\s*)*async\s+(\w+)/g;
     const compiledMethodRegex =
-      /\(0, express_1\.(Get|Post|Put|Patch|Delete)\)\(([^)]*)\),?\s*\(0, express_1\.Use\)\(([\s\S]*?)\),?\s*__param[\s\S]*?(?=], (\w+Controller)\.prototype, "(\w+)")/g;
+      /__decorate\[\s*\(0, express_1\.(Get|Post|Put|Patch|Delete)\)\(([^)]*)\),?\s*\(0, express_1\.Use\)\(([\s\S]*?)\),?\s*__param[\s\S]*?], (\w+Controller)\.prototype, "(\w+)"/g;
     let match;
 
     // Try TypeScript source format first
@@ -311,7 +393,7 @@ async function extractRoutesFromFile(
     // If no routes found, try compiled format
     if (routes.length === 0) {
       while ((match = compiledMethodRegex.exec(content)) !== null) {
-        const [, httpMethod, routePath, useDecorator, , functionName] = match;
+        const [, httpMethod, routePath, useDecorator, controllerClassName, functionName] = match;
         // Clean up the routePath by removing quotes
         const cleanRoutePath = (routePath || "").replace(/['"]/g, "");
         const fullPath = basePath + cleanRoutePath;
@@ -333,8 +415,8 @@ async function extractRoutesFromFile(
             }
           | undefined;
         if (useDecorator) {
-          validation = extractValidationRules(useDecorator);
-          metadata = extractEndpointMetadata(useDecorator);
+          validation = extractCompiledValidationRules(useDecorator);
+          metadata = extractCompiledEndpointMetadata(useDecorator);
         }
 
         routes.push({
