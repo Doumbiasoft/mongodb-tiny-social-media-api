@@ -448,8 +448,4 @@ mongodb-tiny-social-media-api/
 
 ### Were there any requirements that were difficult to implement? What do you think would make them easier to implement in future projects?
 
-
-
 ### What would you add to or change about your application if given more time?
-
-
