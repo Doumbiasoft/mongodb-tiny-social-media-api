@@ -499,7 +499,7 @@ export const generateDynamicOpenAPISpec = async (controllersDir?: string) => {
   const defaultControllersDir =
     controllersDir ||
     (process.env.NODE_ENV === "production"
-      ? path.join(__dirname, "../controllers")
+      ? path.join(process.cwd(), "dist/controllers")
       : path.join(process.cwd(), "src/controllers"));
 
   const controllerFiles = await discoverControllers(defaultControllersDir);
