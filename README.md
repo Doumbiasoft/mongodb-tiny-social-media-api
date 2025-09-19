@@ -7,8 +7,9 @@ A RESTful API for a social media platform built with Express.js, TypeScript, and
 ### The API is live on:
 
 📚 **API Docs:**
-**Scalar UI:** ⚡️ https://mongodb-tiny-social-media-api.onrender.com/docs
-**Swagger UI:** ⚡️ https://mongodb-tiny-social-media-api.onrender.com/swagger
+
+- **Scalar UI:** ⚡️ https://mongodb-tiny-social-media-api.onrender.com/docs
+- **Swagger UI:** ⚡️ https://mongodb-tiny-social-media-api.onrender.com/swagger
 
 ## ✨ Features
 
