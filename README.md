@@ -456,6 +456,19 @@ mongodb-tiny-social-media-api/
 
 ## 🤔 Project Reflection
 
-### Were there any requirements that were difficult to implement? What do you think would make them easier to implement in future projects?
-
 ### What would you add to or change about your application if given more time?
+
+Given more time, I would enhance the application with:
+
+1. **Authentication & Authorization**:
+
+   - JWT-based authentication system
+   - Role-based access control (admin, user, moderator)
+   - Protected routes with middleware
+
+2. **Enhanced Features**:
+   - Like/unlike functionality for posts and comments with optimistic UI updates
+   - Real-time notifications using WebSockets
+   - File upload support for user avatars and post images
+   - Search functionality across posts and users
+   - Pagination for large datasets
