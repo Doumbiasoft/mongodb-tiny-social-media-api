@@ -40,6 +40,13 @@ MONGO_URI=mongodb-url
 
 **Note**: The application will use default values if no `.env` file is provided.
 
+### ⚡️ Project Quick start
+
+```bash
+# this will compile the TypeScript and start the project at once
+npm run serve
+```
+
 ### 🔧 Development
 
 ```bash
