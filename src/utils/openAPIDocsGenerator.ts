@@ -658,14 +658,9 @@ export const generateDynamicOpenAPISpec = async (controllersDir?: string) => {
   const controllerFiles = await discoverControllers(defaultControllersDir);
   const allRoutes: DiscoveredRoute[] = [];
 
-  console.log(`🔍 Discovering controllers in: ${defaultControllersDir}`);
-  console.log(`📁 Found ${controllerFiles.length} controller files:`, controllerFiles);
-
   // Extract routes from each discovered controller
   for (const filePath of controllerFiles) {
-    console.log(`📄 Processing: ${filePath}`);
     const routes = await extractRoutesFromFile(filePath);
-    console.log(`🛣️  Found ${routes.length} routes in ${filePath}`);
     allRoutes.push(...routes);
   }
 
