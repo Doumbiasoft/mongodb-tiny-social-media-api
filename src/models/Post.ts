@@ -1,8 +1,8 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
 
 export interface IPost extends Document {
-  _id: number;
-  userId: number;
+  _id: string;
+  userId: string;
   title: string;
   content: string;
   createdAt: Date;

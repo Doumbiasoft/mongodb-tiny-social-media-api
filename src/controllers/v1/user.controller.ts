@@ -84,8 +84,7 @@ class UserController {
   async addUser(@Req req: Request, @Res res: Response) {
     try {
       const body = req.body;
-
-      const user = await createUser(req.body);
+      const user = await createUser(body);
       return sendResponse(res, user);
     } catch (error: any) {
       return sendError(res, error.message, HttpStatus.BAD_REQUEST);

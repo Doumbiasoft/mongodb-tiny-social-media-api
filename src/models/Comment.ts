@@ -1,9 +1,9 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
 
 export interface IComment extends Document {
-  _id: number;
-  userId: number;
-  postId: number;
+  _id: string;
+  userId: string;
+  postId: string;
   body: string;
   createdAt: Date;
   updatedAt: Date;
