@@ -302,31 +302,48 @@ async function extractRoutesFromFile(
     const routes: DiscoveredRoute[] = [];
 
     // Extract controller name and base path from @Router decorator
-    // Handle both static strings and buildRoute function calls
-    // Also handle compiled format: (0, express_1.Router)((0, apiPrefix_1.buildRoute)("v1/posts"))
+    // Handle both TypeScript source and compiled formats automatically
     let basePath = "";
-    const staticRouterMatch = content.match(/@Router\(['"`]([^'"`]+)['"`]\)/);
-    const buildRouteMatch = content.match(
-      /@Router\(buildRoute\(['"`]([^'"`]+)['"`]\)\)/
-    );
-    const compiledBuildRouteMatch = content.match(
-      /\(0, express_1\.Router\)\(\(0, apiPrefix_1\.buildRoute\)\(['"`]([^'"`]+)['"`]\)\)/
-    );
 
-    if (staticRouterMatch) {
-      basePath = staticRouterMatch[1];
-      // If using path constraints, the full path is /api + controller path
-      if (basePath && !basePath.startsWith("/api")) {
-        basePath = `/api/${basePath}`;
+    // Detect if this is a compiled file by looking for __decorate patterns
+    const isCompiledFile = content.includes('__decorate') && content.includes('express_1.');
+
+    if (isCompiledFile) {
+      // Handle compiled format: (0, express_1.Router)((0, apiPrefix_1.buildRoute)("v1/posts"))
+      const compiledBuildRouteMatch = content.match(
+        /\(0, express_1\.Router\)\(\(0, apiPrefix_1\.buildRoute\)\(['"`]([^'"`]+)['"`]\)\)/
+      );
+      const compiledStaticRouterMatch = content.match(
+        /\(0, express_1\.Router\)\(['"`]([^'"`]+)['"`]\)/
+      );
+
+      if (compiledBuildRouteMatch) {
+        const routePath = compiledBuildRouteMatch[1];
+        basePath = `/api/${routePath}`;
+      } else if (compiledStaticRouterMatch) {
+        basePath = compiledStaticRouterMatch[1];
+        if (basePath && !basePath.startsWith("/api")) {
+          basePath = `/api/${basePath}`;
+        }
       }
-    } else if (buildRouteMatch) {
-      // For buildRoute("v1/users") format, construct the full path
-      const routePath = buildRouteMatch[1];
-      basePath = `/api/${routePath}`;
-    } else if (compiledBuildRouteMatch) {
-      // For compiled format: (0, express_1.Router)((0, apiPrefix_1.buildRoute)("v1/posts"))
-      const routePath = compiledBuildRouteMatch[1];
-      basePath = `/api/${routePath}`;
+    } else {
+      // Handle TypeScript source format: @Router("path") or @Router(buildRoute("v1/users"))
+      const staticRouterMatch = content.match(/@Router\(['"`]([^'"`]+)['"`]\)/);
+      const buildRouteMatch = content.match(
+        /@Router\(buildRoute\(['"`]([^'"`]+)['"`]\)\)/
+      );
+
+      if (staticRouterMatch) {
+        basePath = staticRouterMatch[1];
+        // If using path constraints, the full path is /api + controller path
+        if (basePath && !basePath.startsWith("/api")) {
+          basePath = `/api/${basePath}`;
+        }
+      } else if (buildRouteMatch) {
+        // For buildRoute("v1/users") format, construct the full path
+        const routePath = buildRouteMatch[1];
+        basePath = `/api/${routePath}`;
+      }
     }
 
     // Extract controller class name
@@ -342,56 +359,16 @@ async function extractRoutesFromFile(
     }
 
     // Find all HTTP method decorators and their associated functions
-    // Updated regex to capture @Use decorator content for validation extraction
-    // Also handle compiled format: (0, express_1.Get)("/:id")
+    // Handle both TypeScript source and compiled formats automatically
     const methodRegex =
       /@(Get|Post|Put|Patch|Delete)\(([^)]*)\)\s*(@Use\s*\([\s\S]*?\)\s*)*async\s+(\w+)/g;
     const compiledMethodRegex =
       /__decorate\[\s*\(0, express_1\.(Get|Post|Put|Patch|Delete)\)\(([^)]*)\),?\s*\(0, express_1\.Use\)\(([\s\S]*?)\),?\s*__param[\s\S]*?], (\w+Controller)\.prototype, "(\w+)"/g;
+
     let match;
 
-    // Try TypeScript source format first
-    while ((match = methodRegex.exec(content)) !== null) {
-      const [, httpMethod, routePath, useDecorator, functionName] = match;
-      // Clean up the routePath by removing quotes
-      const cleanRoutePath = (routePath || "").replace(/['"]/g, "");
-      const fullPath = basePath + cleanRoutePath;
-
-      // Extract validation rules and metadata from @Use decorator if present
-      let validation:
-        | {
-            params?: ValidationRule[];
-            query?: ValidationRule[];
-            body?: ValidationRule[];
-          }
-        | undefined;
-      let metadata:
-        | {
-            summary?: string;
-            description?: string;
-            tags?: string[];
-            operationId?: string;
-          }
-        | undefined;
-      if (useDecorator) {
-        validation = extractValidationRules(useDecorator);
-        metadata = extractEndpointMetadata(useDecorator);
-      }
-
-      routes.push({
-        method: httpMethod.toLowerCase(),
-        path: cleanRoutePath,
-        fullPath,
-        controllerName,
-        functionName,
-        entityName,
-        validation,
-        metadata,
-      });
-    }
-
-    // If no routes found, try compiled format
-    if (routes.length === 0) {
+    if (isCompiledFile) {
+      // Use compiled format extraction
       while ((match = compiledMethodRegex.exec(content)) !== null) {
         const [, httpMethod, routePath, useDecorator, controllerClassName, functionName] = match;
         // Clean up the routePath by removing quotes
@@ -417,6 +394,46 @@ async function extractRoutesFromFile(
         if (useDecorator) {
           validation = extractCompiledValidationRules(useDecorator);
           metadata = extractCompiledEndpointMetadata(useDecorator);
+        }
+
+        routes.push({
+          method: httpMethod.toLowerCase(),
+          path: cleanRoutePath,
+          fullPath,
+          controllerName,
+          functionName,
+          entityName,
+          validation,
+          metadata,
+        });
+      }
+    } else {
+      // Use TypeScript source format extraction
+      while ((match = methodRegex.exec(content)) !== null) {
+        const [, httpMethod, routePath, useDecorator, functionName] = match;
+        // Clean up the routePath by removing quotes
+        const cleanRoutePath = (routePath || "").replace(/['"]/g, "");
+        const fullPath = basePath + cleanRoutePath;
+
+        // Extract validation rules and metadata from @Use decorator if present
+        let validation:
+          | {
+              params?: ValidationRule[];
+              query?: ValidationRule[];
+              body?: ValidationRule[];
+            }
+          | undefined;
+        let metadata:
+          | {
+              summary?: string;
+              description?: string;
+              tags?: string[];
+              operationId?: string;
+            }
+          | undefined;
+        if (useDecorator) {
+          validation = extractValidationRules(useDecorator);
+          metadata = extractEndpointMetadata(useDecorator);
         }
 
         routes.push({
