@@ -8,14 +8,8 @@ app.listen(ENV.PORT, () => {
 
   console.log("📚 API Docs:".bold);
   if (ENV.NODE_ENV === "production") {
-    console.log(
-      "   Scalar UI:".bold,
-      `⚡️ ${ENV.API_BASE_URL.cyan}/docs`.green
-    );
-    console.log(
-      "   Swagger UI:".bold,
-      `⚡️ ${ENV.API_BASE_URL.cyan}/swagger`.green
-    );
+    console.log("   Scalar UI:".bold, `⚡️ ${ENV.API_BASE_URL}/docs`.cyan);
+    console.log("   Swagger UI:".bold, `⚡️ ${ENV.API_BASE_URL}/swagger`.cyan);
   } else {
     console.log(
       `🚀 Server running in ${ENV.NODE_ENV.green} mode on port ${
