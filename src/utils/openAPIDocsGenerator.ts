@@ -221,10 +221,14 @@ async function extractRoutesFromFile(
 
     // Extract controller name and base path from @Router decorator
     // Handle both static strings and buildRoute function calls
+    // Also handle compiled format: (0, express_1.Router)((0, apiPrefix_1.buildRoute)("v1/posts"))
     let basePath = "";
     const staticRouterMatch = content.match(/@Router\(['"`]([^'"`]+)['"`]\)/);
     const buildRouteMatch = content.match(
       /@Router\(buildRoute\(['"`]([^'"`]+)['"`]\)\)/
+    );
+    const compiledBuildRouteMatch = content.match(
+      /\(0, express_1\.Router\)\(\(0, apiPrefix_1\.buildRoute\)\(['"`]([^'"`]+)['"`]\)\)/
     );
 
     if (staticRouterMatch) {
@@ -236,6 +240,10 @@ async function extractRoutesFromFile(
     } else if (buildRouteMatch) {
       // For buildRoute("v1/users") format, construct the full path
       const routePath = buildRouteMatch[1];
+      basePath = `/api/${routePath}`;
+    } else if (compiledBuildRouteMatch) {
+      // For compiled format: (0, express_1.Router)((0, apiPrefix_1.buildRoute)("v1/posts"))
+      const routePath = compiledBuildRouteMatch[1];
       basePath = `/api/${routePath}`;
     }
 
@@ -253,10 +261,14 @@ async function extractRoutesFromFile(
 
     // Find all HTTP method decorators and their associated functions
     // Updated regex to capture @Use decorator content for validation extraction
+    // Also handle compiled format: (0, express_1.Get)("/:id")
     const methodRegex =
       /@(Get|Post|Put|Patch|Delete)\(([^)]*)\)\s*(@Use\s*\([\s\S]*?\)\s*)*async\s+(\w+)/g;
+    const compiledMethodRegex =
+      /\(0, express_1\.(Get|Post|Put|Patch|Delete)\)\(([^)]*)\),?\s*\(0, express_1\.Use\)\(([\s\S]*?)\),?\s*__param[\s\S]*?(?=], (\w+Controller)\.prototype, "(\w+)")/g;
     let match;
 
+    // Try TypeScript source format first
     while ((match = methodRegex.exec(content)) !== null) {
       const [, httpMethod, routePath, useDecorator, functionName] = match;
       // Clean up the routePath by removing quotes
@@ -294,6 +306,48 @@ async function extractRoutesFromFile(
         validation,
         metadata,
       });
+    }
+
+    // If no routes found, try compiled format
+    if (routes.length === 0) {
+      while ((match = compiledMethodRegex.exec(content)) !== null) {
+        const [, httpMethod, routePath, useDecorator, , functionName] = match;
+        // Clean up the routePath by removing quotes
+        const cleanRoutePath = (routePath || "").replace(/['"]/g, "");
+        const fullPath = basePath + cleanRoutePath;
+
+        // Extract validation rules and metadata from @Use decorator if present
+        let validation:
+          | {
+              params?: ValidationRule[];
+              query?: ValidationRule[];
+              body?: ValidationRule[];
+            }
+          | undefined;
+        let metadata:
+          | {
+              summary?: string;
+              description?: string;
+              tags?: string[];
+              operationId?: string;
+            }
+          | undefined;
+        if (useDecorator) {
+          validation = extractValidationRules(useDecorator);
+          metadata = extractEndpointMetadata(useDecorator);
+        }
+
+        routes.push({
+          method: httpMethod.toLowerCase(),
+          path: cleanRoutePath,
+          fullPath,
+          controllerName,
+          functionName,
+          entityName,
+          validation,
+          metadata,
+        });
+      }
     }
 
     return routes;
