@@ -31,6 +31,8 @@ const postSchema = new Schema({
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: () => Date.now() },
 });
+postSchema.index({ userId: 1 });
+//postSchema.set("autoIndex", false);
 
 const PostModel: Model<IPost> = mongoose.model<IPost>("Post", postSchema);
 

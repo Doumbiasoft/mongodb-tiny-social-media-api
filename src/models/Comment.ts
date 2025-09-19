@@ -44,6 +44,8 @@ const commentSchema = new Schema({
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: () => Date.now() },
 });
+commentSchema.index({ userId: 1, postId: 1 });
+//commentSchema.set("autoIndex", false);
 
 const CommentModel: Model<IComment> = mongoose.model<IComment>(
   "Comment",
