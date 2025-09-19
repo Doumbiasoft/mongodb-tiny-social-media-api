@@ -4,6 +4,12 @@
 
 A RESTful API for a social media platform built with Express.js, TypeScript, and MongoDB. The API provides endpoints for managing users, posts, and comments, along with the api OpenAPI doc display.
 
+### The API is live on:
+
+📚 **API Docs:**
+**Scalar UI:** ⚡️ https://mongodb-tiny-social-media-api.onrender.com/docs
+**Swagger UI:** ⚡️ https://mongodb-tiny-social-media-api.onrender.com/swagger
+
 ## ✨ Features
 
 - **🔗 RESTful API**: Full CRUD operations for users, posts, and comments
@@ -54,7 +60,11 @@ npm start
 ## 🌐 Base URL
 
 ```
+local:
 http://localhost:PORT/api
+
+live(production):
+https://mongodb-tiny-social-media-api.onrender.com/api
 ```
 
 ## 🔗 API Endpoints
