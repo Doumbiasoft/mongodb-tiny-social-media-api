@@ -1,7 +1,7 @@
 import express from "express";
 import fs from "fs";
 import path from "path";
-import { apiReference } from "@scalar/express-api-reference";
+//import { apiReference } from "@scalar/express-api-reference";
 import swaggerUi from "swagger-ui-express";
 /**
  * Truly dynamic OpenAPI generator that scans controllers directory
@@ -306,7 +306,8 @@ async function extractRoutesFromFile(
     let basePath = "";
 
     // Detect if this is a compiled file by looking for __decorate patterns
-    const isCompiledFile = content.includes('__decorate') && content.includes('express_1.');
+    const isCompiledFile =
+      content.includes("__decorate") && content.includes("express_1.");
 
     if (isCompiledFile) {
       // Handle compiled format: (0, express_1.Router)((0, apiPrefix_1.buildRoute)("v1/posts"))
@@ -370,7 +371,14 @@ async function extractRoutesFromFile(
     if (isCompiledFile) {
       // Use compiled format extraction
       while ((match = compiledMethodRegex.exec(content)) !== null) {
-        const [, httpMethod, routePath, useDecorator, controllerClassName, functionName] = match;
+        const [
+          ,
+          httpMethod,
+          routePath,
+          useDecorator,
+          controllerClassName,
+          functionName,
+        ] = match;
         // Clean up the routePath by removing quotes
         const cleanRoutePath = (routePath || "").replace(/['"]/g, "");
         const fullPath = basePath + cleanRoutePath;
@@ -725,12 +733,15 @@ export const setupDynamicOpenAPI = async (
   // Add Scalar UI
   if (enableScalar) {
     try {
+      const { apiReference } = await import("@scalar/express-api-reference");
       app.use(
         docsPath,
         apiReference({
-          spec: { url: specPath },
+          spec: {
+            url: specPath,
+          },
           theme: "purple",
-        })
+        } as any)
       );
     } catch (error) {
       console.warn(
