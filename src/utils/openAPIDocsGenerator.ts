@@ -1,7 +1,6 @@
 import express from "express";
 import fs from "fs";
 import path from "path";
-//import { apiReference } from "@scalar/express-api-reference";
 import swaggerUi from "swagger-ui-express";
 /**
  * Truly dynamic OpenAPI generator that scans controllers directory
@@ -733,7 +732,12 @@ export const setupDynamicOpenAPI = async (
   // Add Scalar UI
   if (enableScalar) {
     try {
-      const { apiReference } = await import("@scalar/express-api-reference");
+      // Use Function constructor to avoid TypeScript compilation issues with dynamic imports
+      const importScalar = new Function(
+        'return import("@scalar/express-api-reference")'
+      );
+      const { apiReference } = await importScalar();
+
       app.use(
         docsPath,
         apiReference({
@@ -745,7 +749,8 @@ export const setupDynamicOpenAPI = async (
       );
     } catch (error) {
       console.warn(
-        "Scalar API Reference not available, skipping Scalar endpoint"
+        "Scalar API Reference not available, skipping Scalar endpoint:",
+        error
       );
     }
   }
@@ -753,7 +758,7 @@ export const setupDynamicOpenAPI = async (
   // Add Swagger UI
   if (enableSwagger) {
     try {
-      const swaggerSetup = async (req: any, res: any, next: any) => {
+      const swaggerSetup = async (req: any, _res: any, next: any) => {
         const spec = await generateDynamicOpenAPISpec(controllersDir);
         req.swaggerDoc = spec;
         next();
