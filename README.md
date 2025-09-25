@@ -47,6 +47,8 @@ MONGO_URI=mongodb-url
 npm run serve
 ```
 
+### OR
+
 ### 🔧 Development
 
 ```bash
